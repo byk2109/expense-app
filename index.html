@@ -94,6 +94,9 @@
       display: grid;
       gap: 10px;
     }
+    .grid > *, .row > *, .calendar-controls > * {
+      min-width: 0;
+    }
     .grid-2 { grid-template-columns: repeat(2, 1fr); }
     .grid-3 { grid-template-columns: repeat(3, 1fr); }
     label {
@@ -104,12 +107,19 @@
     }
     input, select, textarea {
       width: 100%;
+      max-width: 100%;
+      min-width: 0;
       border: 1px solid var(--line);
       background: #fff;
       border-radius: 12px;
       padding: 12px 13px;
       font-size: 15px;
       color: var(--text);
+    }
+    input[type="date"] {
+      appearance: none;
+      -webkit-appearance: none;
+      overflow: hidden;
     }
     textarea { min-height: 74px; resize: vertical; }
     .segmented {
@@ -256,6 +266,7 @@
       .tab { font-size: 13px; padding: 10px 4px; }
       .day { min-height: 68px; }
       .day-total { font-size: 11px; }
+      input, select, textarea { font-size: 16px; }
     }
   </style>
 </head>
