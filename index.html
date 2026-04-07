@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="지출기록" />
+  <title>매일 지출 기록</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --accent: #111827;
+      --accent-2: #f3f4f6;
+      --danger: #b91c1c;
+      --shadow: 0 6px 18px rgba(17,24,39,0.06);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
+    }
+    .app {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 18px 14px 40px;
+    }
+    h1, h2, h3, p { margin: 0; }
+    .top {
+      padding: 10px 4px 14px;
+    }
+    .top h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .top p {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .field { margin-bottom: 12px; }
+    .label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 7px;
+      font-weight: 700;
+    }
+    input[type="number"], input[type="date"], input[type="text"], select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 12px;
+      padding: 13px 12px;
+      font-size: 16px;
+      outline: none;
+    }
+    input:focus, select:focus {
+      border-color: #c7ccd4;
+      box-shadow: 0 0 0 3px rgba(17,24,39,0.04);
+    }
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .segmented button, .quick-cats button, .tabs button, .actions button, .primary, .secondary, .danger {
+      appearance: none;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 10px;
+      font-size: 15px;
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .segmented button.active, .quick-cats button.active, .tabs button.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .quick-cats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+    .primary {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      font-weight: 800;
+      padding: 14px 12px;
+    }
+    .secondary { background: #fff; }
+    .danger {
+      color: var(--danger);
+      background: #fff;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .stat {
+      background: var(--accent-2);
+      border-radius: 14px;
+      padding: 14px;
+      min-height: 88px;
+    }
+    .stat .k {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .stat .v {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      word-break: keep-all;
+    }
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+    .item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 13px;
+      background: #fff;
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .item-title {
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .item-amount {
+      font-size: 18px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .meta {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .badge {
+      background: var(--accent-2);
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 12px;
+      color: var(--text);
+      font-weight: 700;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .empty {
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+      padding: 18px 10px;
+    }
+    .small-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .row:last-child { border-bottom: none; }
+    .muted { color: var(--muted); }
+    .install-note {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    @media (max-width: 640px) {
+      .stats, .grid-3 { grid-template-columns: 1fr; }
+      .quick-cats { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top">
+      <h1>매일 지출 기록</h1>
+      <p>개인 / 가족 지출을 빠르게 기록하는 1인용 앱</p>
+    </div>
+
+    <div class="card">
+      <div class="section-title" id="formTitle">지출 입력</div>
+      <form id="expenseForm">
+        <input type="hidden" id="editingId" />
+
+        <div class="field">
+          <label class="label" for="amount">금액</label>
+          <input id="amount" type="number" inputmode="numeric" min="0" step="1" placeholder="예: 12000" required />
+        </div>
+
+        <div class="field">
+          <label class="label">구분</label>
+          <div class="segmented" id="ownerButtons">
+            <button type="button" data-owner="개인" class="active">개인</button>
+            <button type="button" data-owner="가족">가족</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">카테고리</label>
+          <div class="quick-cats" id="categoryButtons"></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label class="label" for="date">날짜</label>
+            <input id="date" type="date" required />
+          </div>
+          <div class="field">
+            <label class="label" for="categorySelect">카테고리 선택</label>
+            <select id="categorySelect"></select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="memo">메모</label>
+          <input id="memo" type="text" placeholder="예: 점심, 마트, 택시" maxlength="60" />
+        </div>
+
+        <div class="grid-2">
+          <button class="primary" type="submit" id="saveBtn">저장</button>
+          <button class="secondary" type="button" id="resetBtn">새로 입력</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="section-title">오늘 / 이번 달 요약</div>
+      <div class="stats">
+        <div class="stat">
+          <div class="k">오늘 총액</div>
+          <div class="v" id="todayTotal">0원</div>
+        </div>
+        <div class="stat">
+          <div class="k">오늘 개인</div>
+          <div class="v" id="todayPersonal">0원</div>
+        </div>
+        <div class="stat">
+          <div class="k">오늘 가족</div>
+          <div class="v" id="todayFamily">0원</div>
+        </div>
+        <div class="stat">
+          <div class="k">이번 달 총액</div>
+          <div class="v" id="monthTotal">0원</div>
+        </div>
+        <div class="stat">
+          <div class="k">이번 달 개인</div>
+          <div class="v" id="monthPersonal">0원</div>
+        </div>
+        <div class="stat">
+          <div class="k">이번 달 가족</div>
+          <div class="v" id="monthFamily">0원</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">기록 보기</div>
+      <div class="tabs" id="tabs">
+        <button type="button" data-tab="today" class="active">오늘</button>
+        <button type="button" data-tab="month">이번 달</button>
+        <button type="button" data-tab="all">전체</button>
+      </div>
+      <div class="list" id="expenseList"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">이번 달 카테고리 합계</div>
+      <div class="small-list" id="categorySummary"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">아이폰 설치 방법</div>
+      <div class="install-note">
+        Safari에서 이 파일을 열고 공유 버튼을 누른 뒤 <strong>홈 화면에 추가</strong>를 선택하면 앱처럼 사용할 수 있습니다.<br />
+        처음 1회는 웹서버에 올려서 여는 것이 가장 안정적입니다. 로컬 파일로도 열릴 수 있지만, 설치성과 오프라인 기능은 웹서버 환경이 더 좋습니다.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'daily-expense-pwa-v1';
+    const CATEGORIES = ['식비', '카페', '교통', '쇼핑', '생활', '병원', '취미', '기타'];
+
+    const form = document.getElementById('expenseForm');
+    const amountEl = document.getElementById('amount');
+    const memoEl = document.getElementById('memo');
+    const dateEl = document.getElementById('date');
+    const categorySelectEl = document.getElementById('categorySelect');
+    const categoryButtonsEl = document.getElementById('categoryButtons');
+    const ownerButtonsEl = document.getElementById('ownerButtons');
+    const editingIdEl = document.getElementById('editingId');
+    const formTitleEl = document.getElementById('formTitle');
+    const saveBtnEl = document.getElementById('saveBtn');
+    const resetBtnEl = document.getElementById('resetBtn');
+    const expenseListEl = document.getElementById('expenseList');
+    const categorySummaryEl = document.getElementById('categorySummary');
+    const tabsEl = document.getElementById('tabs');
+
+    let currentOwner = '개인';
+    let currentTab = 'today';
+
+    function todayString() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function won(n) {
+      return `${Number(n || 0).toLocaleString('ko-KR')}원`;
+    }
+
+    function loadExpenses() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      } catch {
+        return [];
+      }
+    }
+
+    function saveExpenses(items) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    function setDefaultForm() {
+      editingIdEl.value = '';
+      amountEl.value = '';
+      memoEl.value = '';
+      dateEl.value = todayString();
+      categorySelectEl.value = CATEGORIES[0];
+      currentOwner = '개인';
+      updateOwnerButtons();
+      updateCategoryButtons(categorySelectEl.value);
+      formTitleEl.textContent = '지출 입력';
+      saveBtnEl.textContent = '저장';
+    }
+
+    function updateOwnerButtons() {
+      [...ownerButtonsEl.querySelectorAll('button')].forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.owner === currentOwner);
+      });
+    }
+
+    function updateCategoryButtons(activeCategory) {
+      [...categoryButtonsEl.querySelectorAll('button')].forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.category === activeCategory);
+      });
+      categorySelectEl.value = activeCategory;
+    }
+
+    function buildCategoryUI() {
+      categorySelectEl.innerHTML = CATEGORIES.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+      categoryButtonsEl.innerHTML = CATEGORIES.slice(0, 6).map(cat => (
+        `<button type="button" data-category="${cat}">${cat}</button>`
+      )).join('');
+      categoryButtonsEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-category]');
+        if (!btn) return;
+        updateCategoryButtons(btn.dataset.category);
+      });
+      categorySelectEl.addEventListener('change', () => updateCategoryButtons(categorySelectEl.value));
+    }
+
+    function buildOwnerUI() {
+      ownerButtonsEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-owner]');
+        if (!btn) return;
+        currentOwner = btn.dataset.owner;
+        updateOwnerButtons();
+      });
+    }
+
+    function isSameMonth(dateStr, refDateStr) {
+      return dateStr.slice(0, 7) === refDateStr.slice(0, 7);
+    }
+
+    function sortNewest(items) {
+      return [...items].sort((a, b) => {
+        if (a.date !== b.date) return b.date.localeCompare(a.date);
+        return b.createdAt - a.createdAt;
+      });
+    }
+
+    function renderStats(items) {
+      const today = todayString();
+      const todayItems = items.filter(x => x.date === today);
+      const monthItems = items.filter(x => isSameMonth(x.date, today));
+
+      const sum = arr => arr.reduce((acc, cur) => acc + Number(cur.amount || 0), 0);
+      const byOwner = (arr, owner) => arr.filter(x => x.owner === owner);
+
+      document.getElementById('todayTotal').textContent = won(sum(todayItems));
+      document.getElementById('todayPersonal').textContent = won(sum(byOwner(todayItems, '개인')));
+      document.getElementById('todayFamily').textContent = won(sum(byOwner(todayItems, '가족')));
+      document.getElementById('monthTotal').textContent = won(sum(monthItems));
+      document.getElementById('monthPersonal').textContent = won(sum(byOwner(monthItems, '개인')));
+      document.getElementById('monthFamily').textContent = won(sum(byOwner(monthItems, '가족')));
+
+      const categoryMap = new Map();
+      monthItems.forEach(item => {
+        categoryMap.set(item.category, (categoryMap.get(item.category) || 0) + Number(item.amount || 0));
+      });
+      const categoryRows = [...categoryMap.entries()].sort((a, b) => b[1] - a[1]);
+      if (!categoryRows.length) {
+        categorySummaryEl.innerHTML = `<div class="empty">이번 달 기록이 없습니다.</div>`;
+      } else {
+        categorySummaryEl.innerHTML = categoryRows.map(([cat, amount]) => `
+          <div class="row">
+            <div>${cat}</div>
+            <div><strong>${won(amount)}</strong></div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function getFilteredItems(items) {
+      const today = todayString();
+      if (currentTab === 'today') return items.filter(x => x.date === today);
+      if (currentTab === 'month') return items.filter(x => isSameMonth(x.date, today));
+      return items;
+    }
+
+    function renderList(items) {
+      const filtered = sortNewest(getFilteredItems(items));
+      if (!filtered.length) {
+        expenseListEl.innerHTML = `<div class="empty">표시할 기록이 없습니다.</div>`;
+        return;
+      }
+      expenseListEl.innerHTML = filtered.map(item => `
+        <div class="item">
+          <div class="item-top">
+            <div>
+              <div class="item-title">${escapeHtml(item.memo || item.category)}</div>
+              <div class="meta">
+                <span class="badge">${item.owner}</span>
+                <span>${item.category}</span>
+                <span>${item.date}</span>
+              </div>
+            </div>
+            <div class="item-amount">${won(item.amount)}</div>
+          </div>
+          ${item.memo ? `<div class="meta" style="margin-top:8px;">메모: ${escapeHtml(item.memo)}</div>` : ''}
+          <div class="actions">
+            <button type="button" class="secondary" data-action="edit" data-id="${item.id}">수정</button>
+            <button type="button" class="danger" data-action="delete" data-id="${item.id}">삭제</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function refresh() {
+      const items = loadExpenses();
+      renderStats(items);
+      renderList(items);
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const amount = Number(amountEl.value);
+      const category = categorySelectEl.value;
+      const memo = memoEl.value.trim();
+      const date = dateEl.value || todayString();
+
+      if (!amount || amount <= 0) {
+        alert('금액을 입력해 주세요.');
+        amountEl.focus();
+        return;
+      }
+
+      const items = loadExpenses();
+      const editingId = editingIdEl.value;
+      if (editingId) {
+        const idx = items.findIndex(x => x.id === editingId);
+        if (idx >= 0) {
+          items[idx] = { ...items[idx], amount, category, memo, date, owner: currentOwner };
+        }
+      } else {
+        items.push({
+          id: crypto.randomUUID(),
+          amount,
+          category,
+          memo,
+          date,
+          owner: currentOwner,
+          createdAt: Date.now()
+        });
+      }
+      saveExpenses(items);
+      setDefaultForm();
+      refresh();
+    });
+
+    resetBtnEl.addEventListener('click', setDefaultForm);
+
+    tabsEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-tab]');
+      if (!btn) return;
+      currentTab = btn.dataset.tab;
+      [...tabsEl.querySelectorAll('button')].forEach(b => b.classList.toggle('active', b.dataset.tab === currentTab));
+      refresh();
+    });
+
+    expenseListEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      const action = btn.dataset.action;
+      const id = btn.dataset.id;
+      const items = loadExpenses();
+      const item = items.find(x => x.id === id);
+      if (!item) return;
+
+      if (action === 'delete') {
+        if (!confirm('이 기록을 삭제하시겠습니까?')) return;
+        saveExpenses(items.filter(x => x.id !== id));
+        refresh();
+        return;
+      }
+
+      if (action === 'edit') {
+        editingIdEl.value = item.id;
+        amountEl.value = item.amount;
+        memoEl.value = item.memo || '';
+        dateEl.value = item.date;
+        currentOwner = item.owner;
+        updateOwnerButtons();
+        updateCategoryButtons(item.category);
+        formTitleEl.textContent = '지출 수정';
+        saveBtnEl.textContent = '수정 저장';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    buildCategoryUI();
+    buildOwnerUI();
+    setDefaultForm();
+    refresh();
+  </script>
+</body>
+</html>
