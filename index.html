@@ -3,560 +3,694 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>매일 지출 기록</title>
-  <meta name="theme-color" content="#ffffff" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>지출 기록 앱</title>
   <style>
     :root {
-      --bg: #f6f7f9;
+      --bg: #f7f8fb;
       --card: #ffffff;
-      --text: #111827;
-      --muted: #6b7280;
+      --text: #1f2937;
+      --sub: #6b7280;
       --line: #e5e7eb;
-      --accent: #111827;
-      --soft: #f3f4f6;
+      --accent: #6b8afd;
+      --accent-soft: #eef2ff;
+      --owner1: #e8f0ff;
+      --owner2: #fef3e8;
+      --owner3: #eefbf1;
+      --danger: #dc2626;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", Segoe UI, sans-serif;
       background: var(--bg);
       color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
     }
-    .wrap {
-      max-width: 760px;
+    .app {
+      max-width: 860px;
       margin: 0 auto;
-      padding: 16px 14px 40px;
+      padding: 16px 16px 80px;
     }
-    h1 {
-      font-size: 24px;
-      margin: 8px 0 16px;
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
     }
-    h2 {
-      font-size: 18px;
-      margin: 0 0 12px;
+    .title { font-size: 24px; font-weight: 800; }
+    .sub { color: var(--sub); font-size: 13px; }
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      padding: 8px 0 12px;
+      z-index: 5;
     }
+    .tab {
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 14px;
+      padding: 11px 8px;
+      font-weight: 700;
+      color: var(--sub);
+      cursor: pointer;
+    }
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    .view { display: none; }
+    .view.active { display: block; }
     .card {
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 18px;
+      border-radius: 20px;
       padding: 16px;
+      box-shadow: var(--shadow);
       margin-bottom: 14px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: 800;
+      margin: 0 0 12px;
     }
     .grid {
       display: grid;
       gap: 10px;
     }
-    .grid-2 {
-      grid-template-columns: 1fr 1fr;
-    }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
     label {
       display: block;
       font-size: 13px;
-      color: var(--muted);
+      font-weight: 700;
       margin-bottom: 6px;
     }
-    input, select, textarea, button {
-      font: inherit;
-    }
-    input[type="number"], input[type="date"], textarea, select {
+    input, select, textarea {
       width: 100%;
       border: 1px solid var(--line);
       background: #fff;
       border-radius: 12px;
-      padding: 12px 14px;
-      outline: none;
+      padding: 12px 13px;
+      font-size: 15px;
+      color: var(--text);
     }
-    textarea {
-      min-height: 78px;
-      resize: vertical;
-    }
-    .chips {
+    textarea { min-height: 74px; resize: vertical; }
+    .segmented {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
     }
-    .chip {
+    .segmented button, .chip {
       border: 1px solid var(--line);
       background: #fff;
       border-radius: 999px;
       padding: 10px 14px;
-      cursor: pointer;
-      color: var(--text);
-    }
-    .chip.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-    .actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-      flex-wrap: wrap;
-    }
-    .btn {
-      border: 0;
-      border-radius: 12px;
-      padding: 12px 16px;
-      cursor: pointer;
-    }
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      flex: 1;
-      min-width: 120px;
-    }
-    .btn-secondary {
-      background: var(--soft);
-      color: var(--text);
-    }
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-    .stat {
-      background: var(--soft);
-      border-radius: 14px;
-      padding: 12px;
-    }
-    .stat .label {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .stat .value {
-      font-size: 18px;
       font-weight: 700;
-      word-break: break-word;
+      cursor: pointer;
+      color: var(--text);
     }
-    .expense-list {
+    .segmented button.active, .chip.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .primary, .secondary, .danger {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .primary { background: var(--accent); color: white; }
+    .secondary { background: #eef2f7; color: var(--text); }
+    .danger { background: #fee2e2; color: var(--danger); }
+    .summary-grid {
       display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
-      margin-top: 10px;
     }
+    .summary-box {
+      border-radius: 16px;
+      padding: 14px;
+      background: #fafafa;
+      border: 1px solid var(--line);
+    }
+    .summary-label { color: var(--sub); font-size: 12px; font-weight: 700; }
+    .summary-value { font-size: 22px; font-weight: 900; margin-top: 6px; }
+    .summary-small { font-size: 14px; font-weight: 800; margin-top: 6px; }
+    .expense-list { display: grid; gap: 10px; }
     .expense-item {
       border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px;
+      border-radius: 16px;
+      padding: 14px;
       background: #fff;
     }
-    .expense-top {
+    .row {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       gap: 10px;
-      align-items: flex-start;
     }
-    .expense-title {
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .expense-meta {
-      font-size: 13px;
-      color: var(--muted);
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .expense-amount {
+    .expense-title { font-size: 15px; font-weight: 800; }
+    .expense-amount { font-size: 18px; font-weight: 900; }
+    .muted { color: var(--sub); font-size: 13px; }
+    .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
       font-weight: 800;
-      white-space: nowrap;
     }
-    .row-actions {
+    .badge.owner1 { background: var(--owner1); }
+    .badge.owner2 { background: var(--owner2); }
+    .badge.owner3 { background: var(--owner3); }
+    .calendar-controls {
       display: flex;
+      justify-content: space-between;
+      align-items: center;
       gap: 8px;
-      margin-top: 10px;
-    }
-    .small-btn {
-      border: 1px solid var(--line);
-      background: #fff;
-      border-radius: 10px;
-      padding: 8px 10px;
-      cursor: pointer;
-    }
-    .empty {
-      color: var(--muted);
-      font-size: 14px;
-      padding: 10px 0 4px;
-    }
-    .section-note {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: -4px;
       margin-bottom: 12px;
     }
-    .month-cats {
+    .calendar-grid {
       display: grid;
-      gap: 8px;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
     }
-    .cat-row {
-      display: flex;
-      justify-content: space-between;
+    .weekday, .day {
+      border-radius: 14px;
+      padding: 8px;
+      min-height: 78px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+    .weekday {
+      min-height: auto;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--sub);
+      background: #f9fafb;
+    }
+    .day.empty { background: transparent; border-style: dashed; }
+    .day.selected { outline: 2px solid var(--accent); }
+    .day-num { font-size: 12px; font-weight: 800; }
+    .day-total { margin-top: 8px; font-size: 12px; font-weight: 800; word-break: break-word; }
+    .day.has-expense { background: var(--accent-soft); }
+    .stats-list { display: grid; gap: 10px; }
+    .bar-item { display: grid; gap: 6px; }
+    .bar-top { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; font-weight: 800; }
+    .bar-bg { height: 10px; background: #eef2f7; border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; background: var(--accent); border-radius: 999px; }
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--line);
-      font-size: 14px;
     }
-    .cat-row:last-child { border-bottom: 0; }
-    .editing-banner {
-      display: none;
-      margin-bottom: 10px;
-      background: #eef2ff;
-      color: #3730a3;
-      border: 1px solid #c7d2fe;
-      padding: 10px 12px;
-      border-radius: 12px;
+    .theme-btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 16px;
+      padding: 12px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .theme-btn.active { outline: 2px solid var(--accent); }
+    .theme-swatches { display: flex; gap: 6px; margin-bottom: 8px; }
+    .theme-swatches span {
+      width: 18px; height: 18px; border-radius: 999px; display: inline-block;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    .empty-state {
+      padding: 18px;
+      border-radius: 16px;
+      background: #fafafa;
+      border: 1px dashed var(--line);
+      color: var(--sub);
+      text-align: center;
       font-size: 14px;
     }
     @media (max-width: 640px) {
-      .grid-2, .stats {
-        grid-template-columns: 1fr;
-      }
-      .expense-top {
-        flex-direction: column;
-      }
-      .expense-amount {
-        white-space: normal;
-      }
+      .summary-grid, .grid-2, .grid-3, .theme-grid { grid-template-columns: 1fr; }
+      .tabs { grid-template-columns: repeat(4, 1fr); }
+      .tab { font-size: 13px; padding: 10px 4px; }
+      .day { min-height: 68px; }
+      .day-total { font-size: 11px; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>매일 지출 기록</h1>
+  <div class="app">
+    <div class="header">
+      <div>
+        <div class="title">지출 기록 앱</div>
+        <div class="sub">입력 · 달력 · 통계 · 설정</div>
+      </div>
+    </div>
 
-    <section class="card">
-      <div class="editing-banner" id="editingBanner">수정 중입니다. 내용을 바꾼 뒤 ‘수정 완료’를 누르세요.</div>
-      <h2>지출 입력</h2>
-      <div class="grid grid-2">
-        <div>
-          <label for="amount">금액</label>
-          <input id="amount" type="number" inputmode="numeric" placeholder="예: 12000" />
+    <div class="tabs">
+      <button class="tab active" data-tab="input">입력</button>
+      <button class="tab" data-tab="calendar">달력</button>
+      <button class="tab" data-tab="stats">통계</button>
+      <button class="tab" data-tab="settings">설정</button>
+    </div>
+
+    <section id="view-input" class="view active">
+      <div class="card">
+        <h2 class="section-title">지출 입력</h2>
+        <div class="grid">
+          <div>
+            <label for="amount">금액</label>
+            <input id="amount" type="number" placeholder="예: 12000" />
+          </div>
+          <div>
+            <label>구분</label>
+            <div class="segmented" id="ownerButtons"></div>
+          </div>
+          <div>
+            <label>카테고리</label>
+            <div class="segmented" id="categoryButtons"></div>
+          </div>
+          <div class="grid grid-2">
+            <div>
+              <label for="date">날짜</label>
+              <input id="date" type="date" />
+            </div>
+            <div>
+              <label for="passCount">회원권 횟수</label>
+              <input id="passCount" type="number" min="0" placeholder="없으면 비워두기" />
+            </div>
+          </div>
+          <div>
+            <label for="memo">메모</label>
+            <textarea id="memo" placeholder="예: 필라테스 10회권 구매 / 점심 / 장보기"></textarea>
+          </div>
+          <div class="actions">
+            <button id="saveBtn" class="primary">저장</button>
+            <button id="cancelBtn" class="secondary" style="display:none;">수정 취소</button>
+          </div>
         </div>
-        <div>
-          <label for="date">날짜</label>
-          <input id="date" type="date" />
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">요약</h2>
+        <div class="summary-grid" id="summaryGrid"></div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">최근 기록</h2>
+        <div id="expenseList" class="expense-list"></div>
+      </div>
+    </section>
+
+    <section id="view-calendar" class="view">
+      <div class="card">
+        <div class="calendar-controls">
+          <button class="secondary" id="prevMonthBtn">이전 달</button>
+          <div id="calendarTitle" class="section-title" style="margin:0;"></div>
+          <button class="secondary" id="nextMonthBtn">다음 달</button>
         </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
       </div>
-
-      <div style="margin-top: 12px;">
-        <label>구분</label>
-        <div class="chips" id="ownerChips"></div>
-      </div>
-
-      <div style="margin-top: 12px;">
-        <label>카테고리</label>
-        <div class="chips" id="categoryChips"></div>
-      </div>
-
-      <div style="margin-top: 12px;">
-        <label for="memo">메모</label>
-        <textarea id="memo" placeholder="예: 점심, 마트, 주차비"></textarea>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-primary" id="saveBtn">저장</button>
-        <button class="btn btn-secondary" id="cancelBtn" type="button" style="display:none;">수정 취소</button>
+      <div class="card">
+        <h2 class="section-title">선택한 날짜 기록</h2>
+        <div id="selectedDateLabel" class="muted" style="margin-bottom:10px;"></div>
+        <div id="selectedDateList" class="expense-list"></div>
       </div>
     </section>
 
-    <section class="card">
-      <h2>오늘 요약</h2>
-      <div class="stats" id="todayStats"></div>
+    <section id="view-stats" class="view">
+      <div class="card">
+        <h2 class="section-title">이번 달 핵심 수치</h2>
+        <div class="summary-grid" id="statsSummaryGrid"></div>
+      </div>
+      <div class="card">
+        <h2 class="section-title">구분별 통계</h2>
+        <div id="ownerStats" class="stats-list"></div>
+      </div>
+      <div class="card">
+        <h2 class="section-title">카테고리별 통계</h2>
+        <div id="categoryStats" class="stats-list"></div>
+      </div>
     </section>
 
-    <section class="card">
-      <h2>이번 달 요약</h2>
-      <div class="stats" id="monthStats"></div>
-    </section>
-
-    <section class="card">
-      <h2>이번 달 카테고리 합계</h2>
-      <div class="section-note">이번 달에 기록된 내역 기준입니다.</div>
-      <div class="month-cats" id="categoryTotals"></div>
-    </section>
-
-    <section class="card">
-      <h2>기록 목록</h2>
-      <div class="section-note">수정하려면 ‘수정’을 누르세요.</div>
-      <div class="expense-list" id="expenseList"></div>
+    <section id="view-settings" class="view">
+      <div class="card">
+        <h2 class="section-title">색상 테마</h2>
+        <div class="theme-grid" id="themeGrid"></div>
+      </div>
+      <div class="card">
+        <h2 class="section-title">데이터 관리</h2>
+        <div class="actions">
+          <button class="secondary" id="exportBtn">JSON 백업</button>
+          <button class="danger" id="resetBtn">전체 기록 삭제</button>
+        </div>
+        <div class="sub" style="margin-top:10px;">회원권은 구매일에 한 번 기록하고, 메모에 내용을 쓰거나 회원권 횟수를 입력해 두면 나중에 찾기 쉽습니다.</div>
+      </div>
     </section>
   </div>
 
   <script>
-    const STORAGE_KEY = 'expense_tracker_owner_v2';
-    const owners = ['개인', '가족'];
-    const categories = ['식비', '카페', '교통', '쇼핑', '생활', '기타'];
+    const STORAGE_KEY = 'expense_app_tabs_v1';
+    const THEME_KEY = 'expense_theme_v1';
+    const owners = ['개인 카드', '가족 카드', '현금'];
+    const categories = ['식비', '카페', '교통', '쇼핑', '회원권', '생활', '병원', '기타'];
+    const themes = {
+      blue: {
+        name: '라이트 블루',
+        vars: { '--accent':'#6b8afd','--accent-soft':'#eef2ff','--owner1':'#e8f0ff','--owner2':'#fef3e8','--owner3':'#eefbf1' },
+        swatches: ['#6b8afd','#eef2ff','#e8f0ff','#eefbf1']
+      },
+      sage: {
+        name: '세이지 그린',
+        vars: { '--accent':'#5b8f7b','--accent-soft':'#edf7f2','--owner1':'#e9f5ef','--owner2':'#f8f0e8','--owner3':'#eefbf3' },
+        swatches: ['#5b8f7b','#edf7f2','#e9f5ef','#f8f0e8']
+      },
+      beige: {
+        name: '웜 베이지',
+        vars: { '--accent':'#b7845c','--accent-soft':'#fcf3ea','--owner1':'#f7ece1','--owner2':'#fff0e6','--owner3':'#f5f5e8' },
+        swatches: ['#b7845c','#fcf3ea','#fff0e6','#f5f5e8']
+      },
+      lavender: {
+        name: '라벤더',
+        vars: { '--accent':'#8b79d6','--accent-soft':'#f3efff','--owner1':'#ece8ff','--owner2':'#fff1ea','--owner3':'#effbf4' },
+        swatches: ['#8b79d6','#f3efff','#ece8ff','#effbf4']
+      }
+    };
 
-    const amountEl = document.getElementById('amount');
-    const dateEl = document.getElementById('date');
-    const memoEl = document.getElementById('memo');
-    const saveBtn = document.getElementById('saveBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const expenseListEl = document.getElementById('expenseList');
-    const todayStatsEl = document.getElementById('todayStats');
-    const monthStatsEl = document.getElementById('monthStats');
-    const categoryTotalsEl = document.getElementById('categoryTotals');
-    const ownerChipsEl = document.getElementById('ownerChips');
-    const categoryChipsEl = document.getElementById('categoryChips');
-    const editingBannerEl = document.getElementById('editingBanner');
-
-    let selectedOwner = '개인';
-    let selectedCategory = '식비';
-    let editingId = null;
     let expenses = loadExpenses();
+    let selectedOwner = owners[0];
+    let selectedCategory = categories[0];
+    let editingId = null;
+    let currentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    let selectedDate = todayStr();
+    let currentTheme = localStorage.getItem(THEME_KEY) || 'blue';
 
-    function todayString() {
-      const now = new Date();
-      const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, '0');
-      const d = String(now.getDate()).padStart(2, '0');
-      return `${y}-${m}-${d}`;
+    function todayStr() {
+      const d = new Date();
+      const off = d.getTimezoneOffset();
+      const local = new Date(d.getTime() - off * 60000);
+      return local.toISOString().split('T')[0];
     }
 
     function loadExpenses() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return [];
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch { return []; }
     }
-
     function saveExpenses() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
     }
-
-    function formatMoney(value) {
-      return `${Number(value || 0).toLocaleString('ko-KR')}원`;
+    function won(n) {
+      return `${Number(n || 0).toLocaleString('ko-KR')}원`;
+    }
+    function esc(str='') {
+      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+    function isSameMonth(dateStr, monthDate) {
+      const d = new Date(dateStr);
+      return d.getFullYear() === monthDate.getFullYear() && d.getMonth() === monthDate.getMonth();
+    }
+    function getMonthExpenses(monthDate = new Date()) {
+      return expenses.filter(e => isSameMonth(e.date, monthDate));
+    }
+    function getTodayExpenses() {
+      return expenses.filter(e => e.date === todayStr());
+    }
+    function sumBy(list, key, value) {
+      return list.filter(item => item[key] === value).reduce((a,b) => a + Number(b.amount || 0), 0);
+    }
+    function total(list) {
+      return list.reduce((a,b) => a + Number(b.amount || 0), 0);
+    }
+    function applyTheme(themeKey) {
+      currentTheme = themeKey;
+      const root = document.documentElement;
+      Object.entries(themes[themeKey].vars).forEach(([k,v]) => root.style.setProperty(k, v));
+      localStorage.setItem(THEME_KEY, themeKey);
+      renderThemes();
     }
 
-    function createChips(container, items, selectedValue, onClick) {
-      container.innerHTML = '';
-      items.forEach(item => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = `chip ${item === selectedValue ? 'active' : ''}`;
-        btn.textContent = item;
-        btn.addEventListener('click', () => onClick(item));
-        container.appendChild(btn);
-      });
+    function renderOwnerButtons() {
+      const wrap = document.getElementById('ownerButtons');
+      wrap.innerHTML = owners.map(o => `<button type="button" class="${selectedOwner===o?'active':''}" onclick="selectOwner('${o}')">${o}</button>`).join('');
     }
-
-    function renderChipGroups() {
-      createChips(ownerChipsEl, owners, selectedOwner, (value) => {
-        selectedOwner = value;
-        renderChipGroups();
-      });
-      createChips(categoryChipsEl, categories, selectedCategory, (value) => {
-        selectedCategory = value;
-        renderChipGroups();
-      });
+    function renderCategoryButtons() {
+      const wrap = document.getElementById('categoryButtons');
+      wrap.innerHTML = categories.map(c => `<button type="button" class="${selectedCategory===c?'active':''}" onclick="selectCategory('${c}')">${c}</button>`).join('');
     }
+    window.selectOwner = function(owner) { selectedOwner = owner; renderOwnerButtons(); }
+    window.selectCategory = function(category) { selectedCategory = category; renderCategoryButtons(); }
 
     function resetForm() {
-      amountEl.value = '';
-      memoEl.value = '';
-      dateEl.value = todayString();
-      selectedOwner = '개인';
-      selectedCategory = '식비';
+      document.getElementById('amount').value = '';
+      document.getElementById('memo').value = '';
+      document.getElementById('passCount').value = '';
+      document.getElementById('date').value = todayStr();
+      selectedOwner = owners[0];
+      selectedCategory = categories[0];
       editingId = null;
-      saveBtn.textContent = '저장';
-      cancelBtn.style.display = 'none';
-      editingBannerEl.style.display = 'none';
-      renderChipGroups();
+      document.getElementById('saveBtn').textContent = '저장';
+      document.getElementById('cancelBtn').style.display = 'none';
+      renderOwnerButtons();
+      renderCategoryButtons();
     }
 
-    function getTodayExpenses() {
-      const today = todayString();
-      return expenses.filter(item => item.date === today);
-    }
-
-    function getMonthExpenses() {
-      const now = new Date();
-      const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-      return expenses.filter(item => String(item.date || '').startsWith(ym));
-    }
-
-    function sumBy(items, predicate = () => true) {
-      return items.filter(predicate).reduce((sum, item) => sum + Number(item.amount || 0), 0);
-    }
-
-    function renderStats() {
-      const todayItems = getTodayExpenses();
-      const monthItems = getMonthExpenses();
-
-      const todayStats = [
-        { label: '오늘 총액', value: formatMoney(sumBy(todayItems)) },
-        { label: '오늘 개인', value: formatMoney(sumBy(todayItems, i => i.owner === '개인')) },
-        { label: '오늘 가족', value: formatMoney(sumBy(todayItems, i => i.owner === '가족')) },
-      ];
-
-      const monthStats = [
-        { label: '이번 달 총액', value: formatMoney(sumBy(monthItems)) },
-        { label: '이번 달 개인', value: formatMoney(sumBy(monthItems, i => i.owner === '개인')) },
-        { label: '이번 달 가족', value: formatMoney(sumBy(monthItems, i => i.owner === '가족')) },
-      ];
-
-      todayStatsEl.innerHTML = todayStats.map(stat => `
-        <div class="stat">
-          <div class="label">${stat.label}</div>
-          <div class="value">${stat.value}</div>
-        </div>
-      `).join('');
-
-      monthStatsEl.innerHTML = monthStats.map(stat => `
-        <div class="stat">
-          <div class="label">${stat.label}</div>
-          <div class="value">${stat.value}</div>
-        </div>
-      `).join('');
-    }
-
-    function renderCategoryTotals() {
-      const monthItems = getMonthExpenses();
-      const totals = categories.map(category => ({
-        category,
-        total: sumBy(monthItems, item => item.category === category)
-      })).filter(item => item.total > 0);
-
-      if (!totals.length) {
-        categoryTotalsEl.innerHTML = '<div class="empty">이번 달 기록이 아직 없습니다.</div>';
+    function saveOrUpdateExpense() {
+      const amount = Number(document.getElementById('amount').value);
+      const memo = document.getElementById('memo').value.trim();
+      const date = document.getElementById('date').value || todayStr();
+      const passCount = document.getElementById('passCount').value ? Number(document.getElementById('passCount').value) : null;
+      if (!amount || amount <= 0) {
+        alert('금액을 입력하세요.');
         return;
       }
-
-      categoryTotalsEl.innerHTML = totals.map(item => `
-        <div class="cat-row">
-          <span>${item.category}</span>
-          <strong>${formatMoney(item.total)}</strong>
-        </div>
-      `).join('');
+      const record = {
+        id: editingId || Date.now(),
+        amount,
+        owner: selectedOwner,
+        category: selectedCategory,
+        memo,
+        passCount,
+        date,
+        createdAt: editingId ? (expenses.find(e=>e.id===editingId)?.createdAt || Date.now()) : Date.now()
+      };
+      if (editingId) {
+        expenses = expenses.map(e => e.id === editingId ? record : e);
+      } else {
+        expenses.unshift(record);
+      }
+      saveExpenses();
+      selectedDate = date;
+      resetForm();
+      renderAll();
     }
 
-    function sortExpenses(items) {
-      return [...items].sort((a, b) => {
-        if (a.date !== b.date) return a.date < b.date ? 1 : -1;
-        return b.id - a.id;
-      });
+    function editExpense(id) {
+      const item = expenses.find(e => e.id === id);
+      if (!item) return;
+      editingId = id;
+      document.getElementById('amount').value = item.amount;
+      document.getElementById('memo').value = item.memo || '';
+      document.getElementById('passCount').value = item.passCount || '';
+      document.getElementById('date').value = item.date;
+      selectedOwner = item.owner;
+      selectedCategory = item.category;
+      renderOwnerButtons();
+      renderCategoryButtons();
+      document.getElementById('saveBtn').textContent = '수정 완료';
+      document.getElementById('cancelBtn').style.display = 'inline-block';
+      showTab('input');
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+    window.editExpense = editExpense;
+
+    function deleteExpense(id) {
+      if (!confirm('이 기록을 삭제할까요?')) return;
+      expenses = expenses.filter(e => e.id !== id);
+      saveExpenses();
+      renderAll();
+    }
+    window.deleteExpense = deleteExpense;
+
+    function expenseItemTemplate(item) {
+      const ownerClass = item.owner === '개인 카드' ? 'owner1' : item.owner === '가족 카드' ? 'owner2' : 'owner3';
+      return `
+        <div class="expense-item">
+          <div class="row">
+            <div>
+              <div class="expense-title">${esc(item.memo || item.category)}</div>
+              <div class="muted">${item.date}</div>
+            </div>
+            <div class="expense-amount">${won(item.amount)}</div>
+          </div>
+          <div class="badges">
+            <span class="badge ${ownerClass}">${esc(item.owner)}</span>
+            <span class="badge">${esc(item.category)}</span>
+            ${item.passCount ? `<span class="badge">회원권 ${item.passCount}회</span>` : ''}
+          </div>
+          ${item.memo ? `<div class="muted" style="margin-top:8px;">${esc(item.memo)}</div>` : ''}
+          <div class="actions" style="margin-top:10px;">
+            <button class="secondary" onclick="editExpense(${item.id})">수정</button>
+            <button class="danger" onclick="deleteExpense(${item.id})">삭제</button>
+          </div>
+        </div>`;
+    }
+
+    function renderSummary() {
+      const today = getTodayExpenses();
+      const month = getMonthExpenses(new Date());
+      const grid = document.getElementById('summaryGrid');
+      const items = [
+        ['오늘 총액', won(total(today))],
+        ['오늘 개인 카드', won(sumBy(today,'owner','개인 카드'))],
+        ['오늘 가족 카드', won(sumBy(today,'owner','가족 카드'))],
+        ['오늘 현금', won(sumBy(today,'owner','현금'))],
+        ['이번 달 총액', won(total(month))],
+        ['이번 달 개인 카드', won(sumBy(month,'owner','개인 카드'))],
+        ['이번 달 가족 카드', won(sumBy(month,'owner','가족 카드'))],
+        ['이번 달 현금', won(sumBy(month,'owner','현금'))],
+      ];
+      grid.innerHTML = items.map(([label, value]) => `<div class="summary-box"><div class="summary-label">${label}</div><div class="summary-value">${value}</div></div>`).join('');
     }
 
     function renderExpenseList() {
-      const sorted = sortExpenses(expenses);
-      if (!sorted.length) {
-        expenseListEl.innerHTML = '<div class="empty">아직 저장된 기록이 없습니다.</div>';
+      const list = document.getElementById('expenseList');
+      const sorted = [...expenses].sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id).slice(0, 20);
+      list.innerHTML = sorted.length ? sorted.map(expenseItemTemplate).join('') : `<div class="empty-state">아직 기록이 없습니다.</div>`;
+    }
+
+    function renderCalendar() {
+      const grid = document.getElementById('calendarGrid');
+      const title = document.getElementById('calendarTitle');
+      title.textContent = `${currentMonth.getFullYear()}년 ${currentMonth.getMonth()+1}월`;
+      const weekdays = ['일','월','화','수','목','금','토'];
+      const startDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
+      const lastDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth()+1, 0).getDate();
+      const monthMap = {};
+      getMonthExpenses(currentMonth).forEach(e => {
+        monthMap[e.date] = (monthMap[e.date] || 0) + Number(e.amount || 0);
+      });
+      let html = weekdays.map(w => `<div class="weekday">${w}</div>`).join('');
+      for (let i=0;i<startDay;i++) html += `<div class="day empty"></div>`;
+      for (let d=1; d<=lastDate; d++) {
+        const dateStr = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth()+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const amt = monthMap[dateStr] || 0;
+        const has = amt > 0;
+        const selected = selectedDate === dateStr;
+        html += `<button class="day ${has?'has-expense':''} ${selected?'selected':''}" onclick="pickDate('${dateStr}')"><div class="day-num">${d}</div>${has ? `<div class="day-total">${Number(amt).toLocaleString('ko-KR')}원</div>` : ''}</button>`;
+      }
+      grid.innerHTML = html;
+      renderSelectedDateList();
+    }
+    window.pickDate = function(dateStr) { selectedDate = dateStr; renderCalendar(); }
+
+    function renderSelectedDateList() {
+      const label = document.getElementById('selectedDateLabel');
+      const list = document.getElementById('selectedDateList');
+      label.textContent = `${selectedDate} · 총 ${won(total(expenses.filter(e => e.date === selectedDate)))}`;
+      const items = expenses.filter(e => e.date === selectedDate).sort((a,b)=>b.id-a.id);
+      list.innerHTML = items.length ? items.map(expenseItemTemplate).join('') : `<div class="empty-state">선택한 날짜의 기록이 없습니다.</div>`;
+    }
+
+    function renderStats() {
+      const month = getMonthExpenses(new Date());
+      const totalMonth = total(month);
+      const statsSummary = document.getElementById('statsSummaryGrid');
+      const avg = month.length ? Math.round(totalMonth / new Set(month.map(e => e.date)).size) : 0;
+      const maxItem = month.length ? [...month].sort((a,b)=>b.amount-a.amount)[0] : null;
+      statsSummary.innerHTML = [
+        ['이번 달 총지출', won(totalMonth)],
+        ['이번 달 기록 수', `${month.length}건`],
+        ['지출 있는 날 평균', won(avg)],
+        ['가장 큰 지출', maxItem ? `${won(maxItem.amount)} / ${esc(maxItem.category)}` : '-']
+      ].map(([label,val]) => `<div class="summary-box"><div class="summary-label">${label}</div><div class="summary-small">${val}</div></div>`).join('');
+
+      renderBarStats('ownerStats', owners.map(o => ({label:o, value:sumBy(month,'owner',o)})), totalMonth);
+      renderBarStats('categoryStats', categories.map(c => ({label:c, value:sumBy(month,'category',c)})).filter(x => x.value > 0), totalMonth);
+    }
+
+    function renderBarStats(targetId, rows, grandTotal) {
+      const target = document.getElementById(targetId);
+      const filtered = rows.filter(r => r.value > 0);
+      if (!filtered.length) {
+        target.innerHTML = `<div class="empty-state">이번 달 데이터가 없습니다.</div>`;
         return;
       }
-
-      expenseListEl.innerHTML = sorted.map(item => `
-        <div class="expense-item">
-          <div class="expense-top">
-            <div>
-              <div class="expense-title">${escapeHtml(item.memo || item.category)}</div>
-              <div class="expense-meta">
-                <span>${item.date}</span>
-                <span>${item.category}</span>
-                <span>${item.owner}</span>
-              </div>
-            </div>
-            <div class="expense-amount">${formatMoney(item.amount)}</div>
-          </div>
-          <div class="row-actions">
-            <button class="small-btn" type="button" onclick="startEdit(${item.id})">수정</button>
-            <button class="small-btn" type="button" onclick="deleteExpense(${item.id})">삭제</button>
-          </div>
-        </div>
-      `).join('');
+      target.innerHTML = filtered.map(r => {
+        const pct = grandTotal ? (r.value / grandTotal * 100) : 0;
+        return `<div class="bar-item"><div class="bar-top"><span>${r.label}</span><span>${won(r.value)} · ${pct.toFixed(1)}%</span></div><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div></div>`;
+      }).join('');
     }
 
-    function escapeHtml(text) {
-      return String(text)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
+    function renderThemes() {
+      const grid = document.getElementById('themeGrid');
+      grid.innerHTML = Object.entries(themes).map(([key, theme]) => `
+        <button class="theme-btn ${currentTheme===key?'active':''}" onclick="chooseTheme('${key}')">
+          <div class="theme-swatches">${theme.swatches.map(s => `<span style="background:${s}"></span>`).join('')}</div>
+          <div style="font-weight:800;">${theme.name}</div>
+        </button>`).join('');
+    }
+    window.chooseTheme = applyTheme;
+
+    function exportJson() {
+      const blob = new Blob([JSON.stringify(expenses, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `expense-backup-${todayStr()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
     }
 
-    function render() {
-      renderChipGroups();
-      renderStats();
-      renderCategoryTotals();
-      renderExpenseList();
-    }
-
-    function validateForm() {
-      const amount = Number(amountEl.value);
-      if (!amount || amount <= 0) {
-        alert('금액을 입력하세요.');
-        amountEl.focus();
-        return false;
-      }
-      if (!dateEl.value) {
-        alert('날짜를 선택하세요.');
-        dateEl.focus();
-        return false;
-      }
-      return true;
-    }
-
-    function upsertExpense() {
-      if (!validateForm()) return;
-
-      const payload = {
-        id: editingId ?? Date.now(),
-        amount: Number(amountEl.value),
-        category: selectedCategory,
-        owner: selectedOwner,
-        memo: memoEl.value.trim(),
-        date: dateEl.value,
-      };
-
-      if (editingId !== null) {
-        expenses = expenses.map(item => item.id === editingId ? payload : item);
-      } else {
-        expenses.push(payload);
-      }
-
+    function resetAll() {
+      if (!confirm('전체 기록을 삭제할까요? 되돌릴 수 없습니다.')) return;
+      expenses = [];
       saveExpenses();
       resetForm();
-      render();
+      renderAll();
     }
 
-    window.startEdit = function(id) {
-      const item = expenses.find(expense => expense.id === id);
-      if (!item) return;
-
-      editingId = id;
-      amountEl.value = item.amount;
-      dateEl.value = item.date;
-      memoEl.value = item.memo || '';
-      selectedOwner = item.owner || '개인';
-      selectedCategory = item.category || '식비';
-      saveBtn.textContent = '수정 완료';
-      cancelBtn.style.display = 'inline-block';
-      editingBannerEl.style.display = 'block';
-      renderChipGroups();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    function showTab(tabName) {
+      document.querySelectorAll('.tab').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabName));
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(`view-${tabName}`).classList.add('active');
+      if (tabName === 'calendar') renderCalendar();
+      if (tabName === 'stats') renderStats();
+      if (tabName === 'settings') renderThemes();
     }
 
-    window.deleteExpense = function(id) {
-      const ok = confirm('이 기록을 삭제하시겠습니까?');
-      if (!ok) return;
-      expenses = expenses.filter(item => item.id !== id);
-      if (editingId === id) resetForm();
-      saveExpenses();
-      render();
+    function renderAll() {
+      renderSummary();
+      renderExpenseList();
+      renderCalendar();
+      renderStats();
+      renderThemes();
     }
 
-    saveBtn.addEventListener('click', upsertExpense);
-    cancelBtn.addEventListener('click', resetForm);
+    document.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => showTab(btn.dataset.tab)));
+    document.getElementById('saveBtn').addEventListener('click', saveOrUpdateExpense);
+    document.getElementById('cancelBtn').addEventListener('click', resetForm);
+    document.getElementById('prevMonthBtn').addEventListener('click', () => { currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth()-1, 1); renderCalendar(); });
+    document.getElementById('nextMonthBtn').addEventListener('click', () => { currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth()+1, 1); renderCalendar(); });
+    document.getElementById('exportBtn').addEventListener('click', exportJson);
+    document.getElementById('resetBtn').addEventListener('click', resetAll);
 
-    dateEl.value = todayString();
-    resetForm();
-    render();
+    document.getElementById('date').value = todayStr();
+    applyTheme(currentTheme);
+    renderOwnerButtons();
+    renderCategoryButtons();
+    renderAll();
   </script>
 </body>
 </html>
